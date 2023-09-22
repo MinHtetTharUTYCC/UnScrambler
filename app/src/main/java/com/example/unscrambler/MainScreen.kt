@@ -101,7 +101,9 @@ fun MainScreen(gameViewModel: GameViewModel = viewModel()){
 
     }
 
-    //EndDialog(100)
+    if (gameUiState.isGameOver) {
+        EndDialog(score = gameUiState.score, onPlayAgain =  { gameViewModel.resetGame() })
+    }
 
 
 }
@@ -175,6 +177,7 @@ fun GameLayout(
                 modifier = Modifier.fillMaxWidth(),
                 onValueChange = onUserGuessChanged,
                 label = {
+                    if(gameUiState.)
                     Text(stringResource(R.string.enter_your_word))
                         },
                 isError = false,
@@ -197,6 +200,7 @@ fun GameLayout(
 @Composable
 fun EndDialog(
     score: Int,
+    onPlayAgain: ()-> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -207,7 +211,7 @@ fun EndDialog(
         text = { Text(text = stringResource(R.string.you_scored,score))},
         onDismissRequest = { /*TODO*/ },
         confirmButton = {
-            TextButton(onClick = { /*TODO*/ }) {
+            TextButton(onClick =  onPlayAgain ) {
                 Text(text = stringResource(R.string.play_again))
             }
         },
