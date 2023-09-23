@@ -5,21 +5,33 @@ import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldColors
@@ -28,6 +40,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,110 +55,135 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.unscrambler.mode.ModesDialog
 import com.example.unscrambler.ui.theme.shapes
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(gameViewModel: GameViewModel = viewModel()){
 
     val gameUiState by gameViewModel.uiState.collectAsState()
 
+    var isMenuVisible by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .padding(dimensionResource(id = R.dimen.padding_medium)),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        Text(
-            text = stringResource(id = R.string.app_name),
-            style = typography.titleLarge
-        )
-
-        GameLayout(
-            currentScrambleWord = if(gameUiState.isSeeing) gameViewModel.currentWord else gameUiState.currentScrambleWord,
-            isGuessWordWrong = gameUiState.isGuessWordWrong,
-            currentWordCount = gameUiState.currentWordCount,
-            userGuess = gameViewModel.userGuess,
-            onUserGuessChanged = { guessWord-> gameViewModel.updateUserGuess(guessWord)},
-            onKeyboardDone = { gameViewModel.checkUserGuess() },
-
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(dimensionResource(id = R.dimen.padding_medium))
-        )
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(id = R.dimen.padding_small)),
-            onClick = {
-                gameViewModel.checkUserGuess()
-            },
-            enabled = !gameUiState.isViewedWord
-        ) {
-            Text(text = stringResource(R.string.submit), fontSize = 16.sp)
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.app_name),
+                        style = typography.titleLarge
+                    )
+                },
+                actions = {
+                    IconButton(onClick = { isMenuVisible = !isMenuVisible }) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = null,
+                            tint = colorScheme.primary
+                        )
+                    }
+                }
+            )
         }
-
-        OutlinedButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(id = R.dimen.padding_small)),
-            onClick = { gameViewModel.skipGame() }
-        ) {
-            Text(text = "Skip", fontSize = 16.sp)
-        }
-
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(id = R.dimen.padding_small)),
-            onClick = { if(gameUiState.isSeeing) gameViewModel.scrambleWord() else gameViewModel.seeWord() })
-
-        {
-            if(gameUiState.isSeeing){
-                Text(text = stringResource(R.string.scramble_word), fontSize = 16.sp)
-            }
-            else {
-                Text(text = stringResource(R.string.see_word), fontSize = 16.sp)
-            }
-
-        }
-
-        GameStatus(
-            score = gameUiState.score,
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium))
-        )
-        
-
-    }
-
-    if (gameUiState.isGameOver) {
-        EndDialog(score = gameUiState.score, onPlayAgain =  { gameViewModel.resetGame() })
-    }
-
-
-}
-
-
-
-@Composable
-fun GameStatus(
-    score: Int,
-    modifier: Modifier = Modifier
-) {
-    Card (
-        modifier = modifier
     ){
-        Text(
-            text = stringResource(R.string.score,score),
-            style = typography.headlineMedium,
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)))
+
+        if (isMenuVisible) {
+            ModesDialog(
+                showDialog = true,
+                onDismissRequest = { isMenuVisible = !isMenuVisible },
+                onConfirmClick = { /*TODO*/ })
+//            ModeDialogWithDropdown(
+//                showDialog = true,
+//                onDismissRequest = { /*TODO*/ },
+//                onConfirmClick = { /*TODO*/ },
+//                onDropdownItemSelected = { },
+//                selectedItem = "Medium"
+//            )
+        }
+
+
+        Column(
+            modifier = Modifier
+                .padding(it),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            GameLayout(
+                currentScrambleWord = if(gameUiState.isSeeing) gameViewModel.currentWord else gameUiState.currentScrambleWord,
+                isGuessWordWrong = gameUiState.isGuessWordWrong,
+                currentWordCount = gameUiState.currentWordCount,
+                userGuess = gameViewModel.userGuess,
+                onUserGuessChanged = { guessWord-> gameViewModel.updateUserGuess(guessWord)},
+                onKeyboardDone = { gameViewModel.checkUserGuess() },
+
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(dimensionResource(id = R.dimen.padding_medium))
+            )
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(id = R.dimen.padding_small)),
+                onClick = {
+                    gameViewModel.checkUserGuess()
+                },
+                enabled = !gameUiState.isViewedWord
+            ) {
+                Text(text = stringResource(R.string.submit), fontSize = 16.sp)
+            }
+
+            OutlinedButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(id = R.dimen.padding_small)),
+                onClick = { gameViewModel.skipGame() }
+            ) {
+                Text(text = "Skip", fontSize = 16.sp)
+            }
+
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(id = R.dimen.padding_small)),
+                onClick = { if(gameUiState.isSeeing) gameViewModel.scrambleWord() else gameViewModel.seeWord() })
+
+            {
+                if(gameUiState.isSeeing){
+                    Text(text = stringResource(R.string.scramble_word), fontSize = 16.sp)
+                }
+                else {
+                    Text(text = stringResource(R.string.see_word), fontSize = 16.sp)
+                }
+
+            }
+
+            GameStatus(
+                score = gameUiState.score,
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium))
+            )
+
+
+        }
+
+        if (gameUiState.isGameOver) {
+            EndDialog(score = gameUiState.score, onPlayAgain =  { gameViewModel.resetGame() })
+        }
+
+
     }
 
 
+
 }
+
+
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -220,6 +260,23 @@ fun GameLayout(
 
 }
 
+@Composable
+fun GameStatus(
+    score: Int,
+    modifier: Modifier = Modifier
+) {
+    Card (
+        modifier = modifier
+    ){
+        Text(
+            text = stringResource(R.string.score,score),
+            style = typography.headlineMedium,
+            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)))
+    }
+
+
+}
+
 
 @Composable
 fun EndDialog(
@@ -249,21 +306,128 @@ fun EndDialog(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ModeDialogWithDropdown(
+    showDialog: Boolean,
+    onDismissRequest: () -> Unit,
+    onConfirmClick: () -> Unit,
+    onDropdownItemSelected: (String) -> Unit,
+    selectedItem: String
+) {
+    if (showDialog) {
+        Dialog(
+            onDismissRequest = { onDismissRequest() }
+        ) {
+            Surface(
+                modifier = Modifier
+                    .width(300.dp)
+                    .wrapContentHeight()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = "Choose Mode",
+                        fontSize = 20.sp
+                    )
+
+                    DropdownMenu(
+                        modifier = Modifier.fillMaxWidth(),
+                        expanded = showDialog,
+                        onDismissRequest = { onDismissRequest() }
+                    ) {
+                        DropdownMenuItem(
+                            text = {
+                                Text(text = "Easy")
+                            },
+                            onClick = {
+                                onDropdownItemSelected("Easy")
+                                onDismissRequest()
+                            })
+
+                        DropdownMenuItem(
+                            text = {
+                                Text(text = "Medium")
+                            },
+                            onClick = {
+                                onDropdownItemSelected("Medium")
+                                onDismissRequest()
+                            })
+
+                        DropdownMenuItem(
+                            text = {
+                                Text(text = "Hard")
+                            },
+                            onClick = {
+                                onDropdownItemSelected("Hard")
+                                onDismissRequest()
+                            })
+
+                    }
+
+                    Text(
+                        text = "Selected Item: $selectedItem",
+                        fontSize = 16.sp
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        TextButton(
+                            onClick = { onDismissRequest() }
+                        ) {
+                            Text(text = "Cancel")
+                        }
+
+                        TextButton(
+                            onClick = {
+                                onConfirmClick()
+                                onDismissRequest()
+                            }
+                        ) {
+                            Text(text = "OK")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+//@Preview(showBackground = true)
+//@Composable
+//fun MainScreenPreview(){
+//    UnScramblerTheme(darkTheme = false) {
+//        MainScreen()
+//    }
+//
+//}
+
+//@Preview(showBackground = false)
+//@Composable
+//fun MainScreenDarkPreview(){
+//    UnScramblerTheme(darkTheme = true) {
+//        MainScreen()
+//    }
+//}
+
 @Preview(showBackground = true)
 @Composable
-fun MainScreenPreview(){
+fun ModeDialogPreview(){
     UnScramblerTheme(darkTheme = false) {
-        MainScreen()
+        ModeDialogWithDropdown(
+            showDialog = true,
+            onDismissRequest = { /*TODO*/ },
+            onConfirmClick = { /*TODO*/ },
+            onDropdownItemSelected = { },
+            selectedItem = "Medium"
+        )
     }
 
 }
 
-@Preview(showBackground = false)
-@Composable
-fun MainScreenDarkPreview(){
-    UnScramblerTheme(darkTheme = true) {
-        MainScreen()
-    }
-
-}
 

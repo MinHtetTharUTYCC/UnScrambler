@@ -9,6 +9,8 @@ import androidx.lifecycle.ViewModel
 import com.example.unscrambler.data.MAX_NO_OF_WORDS
 import com.example.unscrambler.data.SCORE_INCREASE
 import com.example.unscrambler.data.allWords
+import com.example.unscrambler.data.hardWords
+import com.example.unscrambler.data.mediumWords
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -89,7 +91,7 @@ class GameViewModel: ViewModel() {
     }
 
     private fun pickRandomWordAndShuffle(): String {
-        currentWord = allWords.random()
+        currentWord = hardWords.random()
 
         if (usedWords.contains(currentWord)) {
             return pickRandomWordAndShuffle()

@@ -12,4 +12,5 @@
     <string name="wrong_guess">Wrong Guess!</string>
     <string name="see_word">See Word</string>
     <string name="scramble_word">Scramble Word</string>
+    <string name="choose_mode">"Choose Mode: "</string>
 </resources>
