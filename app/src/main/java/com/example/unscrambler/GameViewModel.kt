@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.traceEventEnd
 import androidx.lifecycle.ViewModel
 import com.example.unscrambler.data.MAX_NO_OF_WORDS
 import com.example.unscrambler.data.SCORE_INCREASE
@@ -22,7 +23,7 @@ class GameViewModel: ViewModel() {
     private val _uiState = MutableStateFlow(GameUiState())
     val uiState: StateFlow<GameUiState> = _uiState.asStateFlow()
 
-    private lateinit var currentWord: String
+    lateinit var currentWord: String
     private var usedWords: MutableSet<String> = mutableSetOf()
 
 
@@ -54,6 +55,8 @@ class GameViewModel: ViewModel() {
             _uiState.update { currentState ->
                 currentState.copy(
                     isGuessWordWrong = false,
+                    isSeeing = false,
+                    isViewedWord = false,
                     score = updatedScore,
                     isGameOver = true
                 )
@@ -65,6 +68,8 @@ class GameViewModel: ViewModel() {
             _uiState.update { currentState ->
                 currentState.copy(
                     isGuessWordWrong = false,
+                    isSeeing = false,
+                    isViewedWord = false,
                     score = updatedScore,
                     currentScrambleWord = pickRandomWordAndShuffle(),
                     currentWordCount = currentState.currentWordCount.inc()
@@ -112,6 +117,24 @@ class GameViewModel: ViewModel() {
         updateUserGuess("")
     }
 
+    fun seeWord() {
+        _uiState.update { currentState->
+            currentState.copy(
+                isSeeing =  true,
+                isViewedWord = true
+            )
+        }
+    }
+
+    fun scrambleWord(){
+        _uiState.update { currentState->
+            currentState.copy(
+                isSeeing =  false
+            )
+        }
+    }
+
+
     init {
         resetGame()
     }
@@ -121,6 +144,7 @@ class GameViewModel: ViewModel() {
         _uiState.value = GameUiState(currentScrambleWord = pickRandomWordAndShuffle())
 
     }
+
 
 
 }

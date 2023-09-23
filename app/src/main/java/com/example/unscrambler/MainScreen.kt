@@ -62,11 +62,13 @@ fun MainScreen(gameViewModel: GameViewModel = viewModel()){
         )
 
         GameLayout(
-            currentScrambleWord = gameUiState.currentScrambleWord,
+            currentScrambleWord = if(gameUiState.isSeeing) gameViewModel.currentWord else gameUiState.currentScrambleWord,
+            isGuessWordWrong = gameUiState.isGuessWordWrong,
             currentWordCount = gameUiState.currentWordCount,
             userGuess = gameViewModel.userGuess,
             onUserGuessChanged = { guessWord-> gameViewModel.updateUserGuess(guessWord)},
             onKeyboardDone = { gameViewModel.checkUserGuess() },
+
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
@@ -78,10 +80,10 @@ fun MainScreen(gameViewModel: GameViewModel = viewModel()){
                 .padding(dimensionResource(id = R.dimen.padding_small)),
             onClick = {
                 gameViewModel.checkUserGuess()
-            }
+            },
+            enabled = !gameUiState.isViewedWord
         ) {
             Text(text = stringResource(R.string.submit), fontSize = 16.sp)
-            
         }
 
         OutlinedButton(
@@ -91,6 +93,22 @@ fun MainScreen(gameViewModel: GameViewModel = viewModel()){
             onClick = { gameViewModel.skipGame() }
         ) {
             Text(text = "Skip", fontSize = 16.sp)
+        }
+
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(dimensionResource(id = R.dimen.padding_small)),
+            onClick = { if(gameUiState.isSeeing) gameViewModel.scrambleWord() else gameViewModel.seeWord() })
+
+        {
+            if(gameUiState.isSeeing){
+                Text(text = stringResource(R.string.scramble_word), fontSize = 16.sp)
+            }
+            else {
+                Text(text = stringResource(R.string.see_word), fontSize = 16.sp)
+            }
+
         }
 
         GameStatus(
@@ -132,6 +150,7 @@ fun GameStatus(
 fun GameLayout(
     currentScrambleWord: String,
     currentWordCount: Int,
+    isGuessWordWrong: Boolean,
     userGuess: String,
     onUserGuessChanged: (String) -> Unit,
     onKeyboardDone: () -> Unit,
@@ -177,10 +196,15 @@ fun GameLayout(
                 modifier = Modifier.fillMaxWidth(),
                 onValueChange = onUserGuessChanged,
                 label = {
-                    if(gameUiState.)
-                    Text(stringResource(R.string.enter_your_word))
+
+                    if(isGuessWordWrong){
+                        Text(text = stringResource(id = R.string.wrong_guess))
+                    }
+                    else {
+                        Text(stringResource(R.string.enter_your_word))
+                    }
                         },
-                isError = false,
+                isError = isGuessWordWrong,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done
                 ),

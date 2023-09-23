@@ -9,4 +9,7 @@
     <string name="congratulations">Congratulations!</string>
     <string name="you_scored">You scored: %d</string>
     <string name="exit">Exit</string>
+    <string name="wrong_guess">Wrong Guess!</string>
+    <string name="see_word">See Word</string>
+    <string name="scramble_word">Scramble Word</string>
 </resources>
