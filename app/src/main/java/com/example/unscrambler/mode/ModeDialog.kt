@@ -1,5 +1,7 @@
 package com.example.unscrambler.mode
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,7 +13,10 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Surface
@@ -20,6 +25,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,18 +37,31 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.unscrambler.GameUiState
+import com.example.unscrambler.GameViewModel
 import com.example.unscrambler.UnScramblerTheme
+import kotlinx.coroutines.flow.MutableStateFlow
+
+
 
 @Composable
 fun ModesDialog(
     showDialog: Boolean,
+    gameUiState: GameUiState,
     onDismissRequest: ()-> Unit,
-    onConfirmClick: () -> Unit
+    onConfirmClick: (mode: Mode) -> Unit
 ) {
 
     var easyMode by remember { mutableStateOf(false) }
-    var mediumMode by remember { mutableStateOf(true) }
+    var mediumMode by remember { mutableStateOf(false) }
     var hardMode by remember { mutableStateOf(false) }
+
+    when(gameUiState.currentMode){
+        Mode.EASY-> easyMode = true
+        Mode.MEDIUM-> mediumMode = true
+        Mode.HARD-> hardMode = true
+    }
+
 
     if (showDialog) {
         Dialog(onDismissRequest = { onDismissRequest()}) {
@@ -118,7 +137,17 @@ fun ModesDialog(
 
                         TextButton(
                             onClick = {
-                                onConfirmClick()
+                                Log.d("mode_easy:",easyMode.toString())
+                                Log.d("mode_medium:",mediumMode.toString())
+                                Log.d("mode_hard:",hardMode.toString())
+
+                                val selectedMode = when{
+                                    easyMode -> Mode.EASY
+                                    hardMode -> Mode.HARD
+                                    else -> Mode.MEDIUM
+                                }
+
+                                onConfirmClick(selectedMode)
                                 onDismissRequest()
                             }
                         ) {
@@ -172,6 +201,7 @@ fun ModeToggle(
     }
 }
 
+
 enum class Mode{
     EASY,MEDIUM,HARD
 }
@@ -182,8 +212,12 @@ enum class Mode{
 @Composable
 fun ModesDialogPrw(){
     UnScramblerTheme {
+
+        val gameUiState by GameViewModel().uiState.collectAsState()
+
         ModesDialog(
             showDialog = true,
+            gameUiState = gameUiState,
             onDismissRequest = { /*TODO*/ },
             onConfirmClick = { /*TODO*/ })
     }

@@ -13,4 +13,6 @@
     <string name="see_word">See Word</string>
     <string name="scramble_word">Scramble Word</string>
     <string name="choose_mode">"Choose Mode: "</string>
+    <string name="see_hint">See Hint</string>
+    <string name="hide_hint">Hide Hint</string>
 </resources>

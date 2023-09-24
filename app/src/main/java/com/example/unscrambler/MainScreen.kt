@@ -46,11 +46,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -93,8 +100,9 @@ fun MainScreen(gameViewModel: GameViewModel = viewModel()){
         if (isMenuVisible) {
             ModesDialog(
                 showDialog = true,
+                gameUiState = gameUiState,
                 onDismissRequest = { isMenuVisible = !isMenuVisible },
-                onConfirmClick = { /*TODO*/ })
+                onConfirmClick = { gameViewModel.modeChange(it)} )
 //            ModeDialogWithDropdown(
 //                showDialog = true,
 //                onDismissRequest = { /*TODO*/ },
@@ -112,14 +120,25 @@ fun MainScreen(gameViewModel: GameViewModel = viewModel()){
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
+            val focusManager = LocalFocusManager.current
+
             GameLayout(
                 currentScrambleWord = if(gameUiState.isSeeing) gameViewModel.currentWord else gameUiState.currentScrambleWord,
                 isGuessWordWrong = gameUiState.isGuessWordWrong,
                 currentWordCount = gameUiState.currentWordCount,
                 userGuess = gameViewModel.userGuess,
-                onUserGuessChanged = { guessWord-> gameViewModel.updateUserGuess(guessWord)},
-                onKeyboardDone = { gameViewModel.checkUserGuess() },
-
+                onUserGuessChanged = { guessWord->
+                    gameViewModel.updateUserGuess(guessWord)
+                    gameViewModel.auoHideHint()
+                                     },
+                onKeyboardDone = {
+                    if(gameUiState.isViewedWord){
+                        focusManager.clearFocus()
+                    }
+                    else {
+                        gameViewModel.checkUserGuess()
+                    }
+                                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
@@ -146,21 +165,48 @@ fun MainScreen(gameViewModel: GameViewModel = viewModel()){
                 Text(text = "Skip", fontSize = 16.sp)
             }
 
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(dimensionResource(id = R.dimen.padding_small)),
-                onClick = { if(gameUiState.isSeeing) gameViewModel.scrambleWord() else gameViewModel.seeWord() })
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
 
-            {
-                if(gameUiState.isSeeing){
-                    Text(text = stringResource(R.string.scramble_word), fontSize = 16.sp)
-                }
-                else {
-                    Text(text = stringResource(R.string.see_word), fontSize = 16.sp)
+            ){
+
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(dimensionResource(id = R.dimen.padding_small)),
+                    onClick = { if(gameUiState.isSeeing) gameViewModel.scrambleWord() else gameViewModel.seeWord() })
+
+                {
+                    if(gameUiState.isSeeing){
+                        Text(text = stringResource(R.string.scramble_word), fontSize = 16.sp)
+                    }
+                    else {
+                        Text(text = stringResource(R.string.see_word), fontSize = 16.sp)
+                    }
+
                 }
 
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(dimensionResource(id = R.dimen.padding_small)),
+                    onClick = { if(gameUiState.isHint) gameViewModel.hideHint() else gameViewModel.seeHint() })
+
+                {
+                    if(gameUiState.isHint){
+                        Text(text = stringResource(R.string.hide_hint), fontSize = 16.sp)
+                    }
+                    else {
+                        Text(text = stringResource(R.string.see_hint), fontSize = 16.sp)
+                    }
+
+                }
             }
+
+
 
             GameStatus(
                 score = gameUiState.score,
@@ -171,7 +217,7 @@ fun MainScreen(gameViewModel: GameViewModel = viewModel()){
         }
 
         if (gameUiState.isGameOver) {
-            EndDialog(score = gameUiState.score, onPlayAgain =  { gameViewModel.resetGame() })
+            EndDialog(score = gameUiState.score, onPlayAgain =  { gameViewModel.resetGame(gameUiState.currentMode) })
         }
 
 
@@ -233,7 +279,8 @@ fun GameLayout(
                 value = userGuess,
                 singleLine = true,
                 shape = MaterialTheme.shapes.large,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth(),
                 onValueChange = onUserGuessChanged,
                 label = {
 
@@ -398,22 +445,22 @@ fun ModeDialogWithDropdown(
 }
 
 
-//@Preview(showBackground = true)
-//@Composable
-//fun MainScreenPreview(){
-//    UnScramblerTheme(darkTheme = false) {
-//        MainScreen()
-//    }
-//
-//}
+@Preview(showBackground = true)
+@Composable
+fun MainScreenPreview(){
+    UnScramblerTheme(darkTheme = false) {
+        MainScreen()
+    }
 
-//@Preview(showBackground = false)
-//@Composable
-//fun MainScreenDarkPreview(){
-//    UnScramblerTheme(darkTheme = true) {
-//        MainScreen()
-//    }
-//}
+}
+
+@Preview(showBackground = false)
+@Composable
+fun MainScreenDarkPreview(){
+    UnScramblerTheme(darkTheme = true) {
+        MainScreen()
+    }
+}
 
 @Preview(showBackground = true)
 @Composable

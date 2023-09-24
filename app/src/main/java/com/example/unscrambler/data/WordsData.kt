@@ -19,8 +19,6 @@ package com.example.unscrambler.data
 const val MAX_NO_OF_WORDS = 10
 const val SCORE_INCREASE = 20
 
-
-
 val allWords: Set<String> =
     setOf(
         "animal",
@@ -204,7 +202,8 @@ val allWords: Set<String> =
         "zeal"
     )
 
-
 val easyWords =  allWords.filter{ it.length >= 3 && it.length <= 4 }.toSet()
 val mediumWords =  allWords.filter{ it.length >= 5 && it.length <= 7 }.toSet()
 val hardWords = allWords.filter { it.length >= 8 }
+
+
