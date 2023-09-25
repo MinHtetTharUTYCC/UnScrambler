@@ -102,7 +102,9 @@ fun MainScreen(gameViewModel: GameViewModel = viewModel()){
                 showDialog = true,
                 gameUiState = gameUiState,
                 onDismissRequest = { isMenuVisible = !isMenuVisible },
-                onConfirmClick = { gameViewModel.modeChange(it)} )
+                onConfirmClick = { selectedMode,category ->
+                    gameViewModel.modeChange(selectedMode,category)
+                } )
 //            ModeDialogWithDropdown(
 //                showDialog = true,
 //                onDismissRequest = { /*TODO*/ },
@@ -217,7 +219,12 @@ fun MainScreen(gameViewModel: GameViewModel = viewModel()){
         }
 
         if (gameUiState.isGameOver) {
-            EndDialog(score = gameUiState.score, onPlayAgain =  { gameViewModel.resetGame(gameUiState.currentMode) })
+            EndDialog(
+                score = gameUiState.score,
+                onPlayAgain =  {
+                    gameViewModel.resetGame(gameUiState.currentMode,gameUiState.customCategory)
+                }
+            )
         }
 
 

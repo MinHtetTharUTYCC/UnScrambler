@@ -7,6 +7,7 @@ data class GameUiState(
     val currentWordCount: Int = 1,
     val isGuessWordWrong: Boolean = false,
     val currentMode: Mode = Mode.MEDIUM,
+    val customCategory: String = "",
     val score: Int = 0,
     val isViewedWord: Boolean = false,
     val isSeeing: Boolean = false,

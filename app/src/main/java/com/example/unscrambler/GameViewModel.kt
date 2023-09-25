@@ -109,6 +109,7 @@ class GameViewModel: ViewModel() {
             Mode.EASY -> easyWords.random();
             Mode.MEDIUM -> mediumWords.random()
             Mode.HARD -> hardWords.random()
+            Mode.CUSTOM -> easyWords.random()
         }
 
 
@@ -189,20 +190,20 @@ class GameViewModel: ViewModel() {
 
 
 
-    fun modeChange(mode: Mode){
+    fun modeChange(mode: Mode,category: String){
         updateUserGuess("")
-        resetGame(mode)
+        resetGame(mode,category)
     }
 
 
     init {
-        resetGame(Mode.MEDIUM)
+        resetGame(Mode.MEDIUM,"")
 
     }
 
-    fun resetGame(mode: Mode) {
+    fun resetGame(mode: Mode,category: String) {
         usedWords.clear()
-        _uiState.value = GameUiState(currentScrambleWord = pickRandomWordAndShuffle(mode), currentMode = mode)
+        _uiState.value = GameUiState(currentScrambleWord = pickRandomWordAndShuffle(mode), currentMode = mode, customCategory = category)
 
     }
 

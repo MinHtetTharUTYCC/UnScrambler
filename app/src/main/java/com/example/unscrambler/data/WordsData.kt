@@ -19,6 +19,33 @@ package com.example.unscrambler.data
 const val MAX_NO_OF_WORDS = 10
 const val SCORE_INCREASE = 20
 
+val customList: List<String> = listOf(
+    "dream",
+    "dusk",
+    "eating",
+    "elephant",
+    "emerald",
+    "eerie",
+    "electric",
+    "finish",
+    "flowers",
+    "follow",
+    "fox",
+    "frame",
+    "free",
+    "frequent",
+    "funnel",
+    "green",
+    "guitar",
+    "grocery",
+    "glass",
+    "great",
+    "giggle",
+    "haircut",
+    "half",
+    "homemade"
+)
+
 val allWords: Set<String> =
     setOf(
         "animal",
@@ -201,6 +228,14 @@ val allWords: Set<String> =
         "zone",
         "zeal"
     )
+
+val hobbies: Set<String> = setOf(
+    "drawing", "painting", "sculpting", "writing", "composing music", "playing an instrument", "photography", "filmmaking", "acting", "dancing", "singing", "woodworking", "knitting", "crocheting", "sewing", "origami", "pottery", "glassblowing", "jewelry making", "soapmaking", "candle making",
+    "hiking", "camping", "fishing", "hunting", "biking", "running", "swimming", "dancing", "playing sports", "yoga", "Pilates", "martial arts", "rock climbing", "skiing", "snowboarding", "surfing", "skateboarding", "scuba diving", "skydiving", "bungee jumping", "whitewater rafting", "kayaking", "canoeing", "horseback riding", "skateboarding", "surfing", "snowboarding",
+    "reading", "writing", "playing board games", "doing puzzles", "learning a new language", "coding", "playing chess", "solving math problems", "reading", "writing", "playing board games", "doing puzzles", "learning a new language", "coding", "playing chess", "solving math problems",
+    "spending time with family and friends", "volunteering", "attending events", "joining clubs", "traveling", "playing video games", "spending time on social media", "watching TV", "listening to music", "spending time with family and friends", "volunteering", "attending events", "joining clubs", "traveling", "playing video games", "spending time on social media", "watching TV", "listening to music",
+    "cooking", "baking", "gardening", "playing video games", "watching TV", "listening to music", "collecting", "organizing", "cleaning", "decorating", "gardening", "cooking", "baking", "playing video games", "watching TV", "listening to music", "collecting", "organizing", "cleaning", "decorating"
+)
 
 val easyWords =  allWords.filter{ it.length >= 3 && it.length <= 4 }.toSet()
 val mediumWords =  allWords.filter{ it.length >= 5 && it.length <= 7 }.toSet()
